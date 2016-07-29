@@ -8,13 +8,25 @@ acme_tiny (){
 
     set -e
     if [ -s /tmp/acme.crt ]; then
-       cat /tmp/acme.crt keys/lets-encrypt-x3-cross-signed.pem > $PEM
+       cat /tmp/acme.crt $CROSS > $PEM
     else
        echo "could not create cert for ${domain}"
     fi
 }
 
 cd
+
+CROSS=keys/lets-encrypt-x3-cross-signed.pem
+
+if test `find "$CROSS" -mtime 30`
+then
+    wget -O - https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem > /tmp/lets-encrypt-x3-cross-signed.pem
+    if [ -s /tmp/lets-encrypt-x3-cross-signed.pem ]; then
+        mv /tmp/lets-encrypt-x3-cross-signed.pem keys/
+    fi
+fi
+
+
 domains=$(cat domains.txt)
 rm -f challenges/*
 
