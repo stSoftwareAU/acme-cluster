@@ -26,7 +26,6 @@ then
     fi
 fi
 
-
 domains=$(cat domains.txt)
 rm -f challenges/*
 
@@ -34,9 +33,15 @@ for domain in $domains
 do
     CSR=csr/${domain}.csr
     if [ ! -f $CSR ]; then
-       echo "create a certificate signing request (CSR) for: ${domain}"
-       openssl req -new -sha256 -key keys/domain.key -subj "/CN=${domain}" > $CSR
-
+        echo "create a certificate signing request (CSR) for: ${domain}"
+        
+        if [[ "${domain}" =~ ".*[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+" ]]; then
+            echo "Single domain: ${domain}"
+            openssl req -new -sha256 -key keys/domain.key -subj "/CN=${domain}" > $CSR
+        else
+            echo "multiple domains: www.${domain} & ${domain}"
+            openssl req -new -sha256 -key keys/domain.key -subj "/" -reqexts SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=DNS:${domain},DNS:www.${domain}")) > $CSR
+        fi
     fi
 
     PEM=certs/${domain}.pem
@@ -44,10 +49,15 @@ do
        echo "create cert for: ${domain}"
        acme_tiny
     else
-        if test `find "$PEM" -mtime 30`
-        then
-            echo "renew cert for: ${domain}"
+        if [[ $CSR -nt $PEM ]]; then
+            echo "$CSR is newer than $PEM"
             acme_tiny
+        else 
+            if test `find "$PEM" -mtime 30`
+            then
+                echo "renew cert for: ${domain}"
+                acme_tiny
+            fi
         fi
     fi
 done
