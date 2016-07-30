@@ -38,12 +38,14 @@ EOF
         ServerAlias www.${domain}
 EOF1
     fi
+#        SSLEngine on
+
     cat >> $tmpfile << EOF2
-        SSLEngine on
         JkMount /* ${MOUNT}
 
         SSLCertificateFile /home/letsencrypt/certs/${domain}.pem
         SSLCertificateKeyFile /home/letsencrypt/keys/domain.key
+        SSLCertificateChainFile /home/letsencrypt/keys/lets-encrypt-x3-cross-signed.pem
         Header always set Strict-Transport-Security "max-age=31536000"
     </VirtualHost>
 </IfModule>
