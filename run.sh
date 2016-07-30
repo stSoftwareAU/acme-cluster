@@ -99,7 +99,7 @@ do
             fi
         fi
     fi
-    SITE=certs/${domain}.conf
+    SITE=sites/${domain}.conf
     if [ -f $PEM ]; then
         if [ ! -f $SITE ]; then
             echo "create site for: ${domain}"
