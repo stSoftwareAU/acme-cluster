@@ -14,6 +14,44 @@ acme_tiny (){
     fi
 }
 
+defaults() {
+    if [ -f  ~/env.sh ]; then
+       . ~/env.sh
+    fi
+
+    if [[ ! $MOUNT = *[!\ ]* ]]; then
+       MOUNT="www"
+    fi
+}
+
+create_site(){
+    tmpfile=$(mktemp /tmp/site.XXXXXX)
+    
+    cat >$tmpfile << EOF
+<IfModule mod_ssl.c>
+    <VirtualHost *:443>
+        ServerName ${domain}
+                
+EOF
+    if [[ ! "${domain}" =~ ".*[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+" ]]; then
+        cat >> $tmpfile << EOF1
+        ServerAlias www.${domain}
+EOF1
+    fi
+    cat >> $tmpfile << EOF2
+        SSLEngine on
+        JkMount /* ${MOUNT}
+
+        SSLCertificateFile /home/letsencrypt/certs/${domain}.pem
+        SSLCertificateKeyFile /home/letsencrypt/keys/domain.key
+        Header always set Strict-Transport-Security "max-age=31536000"
+    </VirtualHost>
+</IfModule>
+EOF2
+
+    mv $tmpfile $SITE
+}
+
 cd
 
 CROSS=keys/lets-encrypt-x3-cross-signed.pem
@@ -28,6 +66,7 @@ fi
 
 domains=$(cat domains.txt)
 rm -f challenges/*
+mkdir -p sites
 
 for domain in $domains
 do
@@ -58,6 +97,13 @@ do
                 echo "renew cert for: ${domain}"
                 acme_tiny
             fi
+        fi
+    fi
+    SITE=certs/${domain}.conf
+    if [ -f $PEM ]; then
+        if [ ! -f $SITE ]; then
+            echo "create site for: ${domain}"
+            create_site
         fi
     fi
 done
