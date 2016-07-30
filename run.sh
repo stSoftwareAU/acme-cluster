@@ -52,6 +52,8 @@ EOF2
     mv $tmpfile $SITE
 }
 
+defaults
+
 cd
 
 CROSS=keys/lets-encrypt-x3-cross-signed.pem
@@ -99,7 +101,7 @@ do
             fi
         fi
     fi
-    SITE=sites/${domain}.conf
+    SITE=sites/100-${domain}.conf
     if [ -f $PEM ]; then
         if [ ! -f $SITE ]; then
             echo "create site for: ${domain}"
