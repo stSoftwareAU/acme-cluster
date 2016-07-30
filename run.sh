@@ -39,11 +39,10 @@ EOF
         ServerAlias www.${domain}
 EOF1
     fi
-#        SSLEngine on
 
     cat >> $tmpfile << EOF2
         JkMount /* ${MOUNT}
-
+        SSLEngine on
         SSLCertificateFile /home/letsencrypt/certs/${domain}.pem
         SSLCertificateKeyFile /home/letsencrypt/keys/domain.key
         SSLCertificateChainFile /home/letsencrypt/keys/lets-encrypt-x3-cross-signed.pem
