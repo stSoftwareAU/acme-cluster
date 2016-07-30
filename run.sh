@@ -8,7 +8,8 @@ acme_tiny (){
 
     set -e
     if [ -s /tmp/acme.crt ]; then
-       cat /tmp/acme.crt $CROSS > $PEM
+        mv /tmp/acme.crt $PEM
+       #cat /tmp/acme.crt $CROSS > $PEM
     else
        echo "could not create cert for ${domain}"
     fi
