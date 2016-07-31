@@ -29,27 +29,54 @@ create_site(){
     tmpfile=$(mktemp /tmp/site.XXXXXX)
     
     cat >$tmpfile << EOF
-<IfModule mod_ssl.c>
-    <VirtualHost *:443>
+Alias /.well-known/acme-challenge/ /home/letsencrypt/challenges/
+<Directory /home/letsencrypt/challenges>
+   AllowOverride None
+   Require all granted
+   Satisfy Any
+</Directory>
+
+<VirtualHost *:80>
         ServerName ${domain}
-                
 EOF
     if [[ ! "${domain}" =~ ".*[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+" ]]; then
-        cat >> $tmpfile << EOF1
+        cat >>$tmpfile << EOF1
         ServerAlias www.${domain}
 EOF1
     fi
+    
+    cat >>$tmpfile << EOF2
+        JkMount /* ${MOUNT}
+        JkUnMount /.well-known/acme-challenge/* ${MOUNT}
+        ErrorLog \${APACHE_LOG_DIR}/${domain}/error.log
+        CustomLog \${APACHE_LOG_DIR}/${domain}/access.log combined
+</VirtualHost>
+    
+<IfModule mod_ssl.c>
+    <VirtualHost *:443>
+        ServerName ${domain}
+EOF2
 
-    cat >> $tmpfile << EOF2
+    if [[ ! "${domain}" =~ ".*[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+" ]]; then
+        cat >> $tmpfile << EOF3
+        ServerAlias www.${domain}
+EOF3
+    fi
+
+    cat >> $tmpfile << EOF4
         JkMount /* ${MOUNT}
         SSLEngine on
         SSLCertificateFile /home/letsencrypt/certs/${domain}.pem
         SSLCertificateKeyFile /home/letsencrypt/keys/domain.key
         SSLCertificateChainFile /home/letsencrypt/keys/lets-encrypt-x3-cross-signed.pem
+
         Header always set Strict-Transport-Security "max-age=31536000"
+
+        ErrorLog \${APACHE_LOG_DIR}/${domain}/error.log
+        CustomLog \${APACHE_LOG_DIR}/${domain}/access.log combined
     </VirtualHost>
 </IfModule>
-EOF2
+EOF4
 
     mv $tmpfile $SITE
 }
