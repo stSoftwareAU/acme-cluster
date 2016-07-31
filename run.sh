@@ -29,13 +29,6 @@ create_site(){
     tmpfile=$(mktemp /tmp/site.XXXXXX)
     
     cat >$tmpfile << EOF
-Alias /.well-known/acme-challenge/ /home/letsencrypt/challenges/
-<Directory /home/letsencrypt/challenges>
-   AllowOverride None
-   Require all granted
-   Satisfy Any
-</Directory>
-
 <VirtualHost *:80>
         ServerName ${domain}
 EOF
@@ -48,8 +41,6 @@ EOF1
     cat >>$tmpfile << EOF2
         JkMount /* ${MOUNT}
         JkUnMount /.well-known/acme-challenge/* ${MOUNT}
-        ErrorLog \${APACHE_LOG_DIR}/${domain}/error.log
-        CustomLog \${APACHE_LOG_DIR}/${domain}/access.log combined
 </VirtualHost>
     
 <IfModule mod_ssl.c>
@@ -71,9 +62,6 @@ EOF3
         SSLCertificateChainFile /home/letsencrypt/keys/lets-encrypt-x3-cross-signed.pem
 
         Header always set Strict-Transport-Security "max-age=31536000"
-
-        ErrorLog \${APACHE_LOG_DIR}/${domain}/error.log
-        CustomLog \${APACHE_LOG_DIR}/${domain}/access.log combined
     </VirtualHost>
 </IfModule>
 EOF4
