@@ -93,7 +93,7 @@ do
     if [ ! -f $CSR ]; then
         echo "create a certificate signing request (CSR) for: ${domain}"
         
-        if [[ "${domain}" =~ ".*[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+\.[a-z0-9A-Z\-_]+" ]]; then
+        if [[ ${domain} =~ ([^\.]+\.){3,}.+ ]]; then
             echo "Single domain: ${domain}"
             openssl req -new -sha256 -key keys/domain.key -subj "/CN=${domain}" > $CSR
         else
