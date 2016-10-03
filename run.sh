@@ -4,7 +4,7 @@ acme_tiny (){
 
     rm -f /tmp/acme.crt
     set +e
-    python acme_tiny.py --account-key keys/account.key --csr $CSR --acme-dir challenges > /tmp/acme.crt
+    python acme_tiny.py --account-key ~/keys/account.key --csr $CSR --acme-dir ~/challenges > /tmp/acme.crt
 
     set -e
     if [ -s /tmp/acme.crt ]; then
@@ -71,25 +71,25 @@ EOF4
 
 defaults
 
-cd
+cd ~/acme-cluster
 
-CROSS=keys/lets-encrypt-x3-cross-signed.pem
+CROSS=~/keys/lets-encrypt-x3-cross-signed.pem
 
 if test `find "$CROSS" -mtime 30`
 then
     wget -O - https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem > /tmp/lets-encrypt-x3-cross-signed.pem
     if [ -s /tmp/lets-encrypt-x3-cross-signed.pem ]; then
-        mv /tmp/lets-encrypt-x3-cross-signed.pem keys/
+        mv /tmp/lets-encrypt-x3-cross-signed.pem ~/keys/
     fi
 fi
 
-domains=$(cat domains.txt)
-rm -f challenges/*
-mkdir -p sites
+domains=$(cat ~/domains.txt)
+rm -f ~/challenges/*
+mkdir -p ~/sites
 
 for domain in $domains
 do
-    CSR=csr/${domain}.csr
+    CSR=~/csr/${domain}.csr
     if [ ! -f $CSR ]; then
         echo "create a certificate signing request (CSR) for: ${domain}"
         
@@ -102,7 +102,7 @@ do
         fi
     fi
 
-    PEM=certs/${domain}.pem
+    PEM=~/certs/${domain}.pem
     if [ ! -f $PEM ]; then
        echo "create cert for: ${domain}"
        acme_tiny
@@ -118,7 +118,7 @@ do
             fi
         fi
     fi
-    SITE=sites/100-${domain}.conf
+    SITE=~/sites/100-${domain}.conf
     if [ -f $PEM ]; then
         if [ ! -f $SITE ]; then
             echo "create site for: ${domain}"
