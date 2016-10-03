@@ -112,7 +112,7 @@ def get_crt(account_key, csr, acme_dir, log=LOGGER, CA=DEFAULT_CA):
             wellknown_file.write(keyauthorization)
 
         # Send the challenges to others in the cluster.
-        subprocess.call("./sync.sh")
+        subprocess.call("~/sync.sh")
 
         # check that the file is in place
         #wellknown_url = "http://{0}/.well-known/acme-challenge/{1}".format(domain, token)
