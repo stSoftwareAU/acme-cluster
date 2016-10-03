@@ -29,6 +29,8 @@ create_site(){
     tmpfile=$(mktemp /tmp/site.XXXXXX)
     
     cat >$tmpfile << EOF
+    Alias /.well-known/acme-challenge/ /home/letsencrypt/challenges/
+
 <VirtualHost *:80>
         ServerName ${domain}
 EOF
