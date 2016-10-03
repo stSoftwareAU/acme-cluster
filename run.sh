@@ -95,10 +95,10 @@ do
         
         if [[ ${domain} =~ ([^\.]+\.){3,}.+ ]]; then
             echo "Single domain: ${domain}"
-            openssl req -new -sha256 -key keys/domain.key -subj "/CN=${domain}" > $CSR
+            openssl req -new -sha256 -key ~/keys/domain.key -subj "/CN=${domain}" > $CSR
         else
             echo "multiple domains: www.${domain} & ${domain}"
-            openssl req -new -sha256 -key keys/domain.key -subj "/" -reqexts SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=DNS:${domain},DNS:www.${domain}")) > $CSR
+            openssl req -new -sha256 -key ~/keys/domain.key -subj "/" -reqexts SAN -config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=DNS:${domain},DNS:www.${domain}")) > $CSR
         fi
     fi
 
