@@ -127,4 +127,4 @@ do
     fi
 done
 
-./sync.sh
+~/sync.sh
