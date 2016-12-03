@@ -29,6 +29,22 @@ defaults() {
     if [[ ! $MOUNT = *[!\ ]* ]]; then
        MOUNT="www"
     fi
+    
+    if [ ! -f ~/keys/account.key ]; then
+        openssl genrsa 4096 > ~/keys/account.key
+    fi
+
+    if [ ! -f ~/keys/domain.key ]; then
+        #generate a domain private key (if you haven't already)
+        openssl genrsa 4096 > ~/keys/domain.key
+    fi
+
+
+    if [ ! -f ~/keys/lets-encrypt-x3-cross-signed.pem ]; then
+        cd ~/keys
+        wget -N https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem
+        cd ~
+    fi
 }
 
 create_site(){
