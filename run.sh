@@ -113,7 +113,7 @@ mkdir -p ~/sites
 for domain in $domains
 do
     CSR=~/csr/${domain}.csr
-    if [ ! -f $CSR ]; then
+    if [ ! -s $CSR ]; then
         echo "create a certificate signing request (CSR) for: ${domain}"
         
         if [[ ${domain} =~ ([^\.]+\.){3,}.+ ]]; then
@@ -126,7 +126,7 @@ do
     fi
 
     PEM=~/certs/${domain}.pem
-    if [ ! -f $PEM ]; then
+    if [ ! -s $PEM ]; then
        echo "create cert for: ${domain}"
        acme_tiny
     else
