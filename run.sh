@@ -16,6 +16,11 @@ acme_tiny (){
 }
 
 defaults() {
+    mkdir -p ~/csr
+    mkdir -p ~/keys
+    mkdir -p ~/certs
+    mkdir -p ~/challenges
+    
     if [ -f  ~/env.sh ]; then
        . ~/env.sh
     fi
