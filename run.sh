@@ -16,6 +16,7 @@ acme_tiny (){
 }
 
 defaults() {
+
     mkdir -p ~/csr
     mkdir -p ~/keys
     mkdir -p ~/certs
