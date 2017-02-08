@@ -21,7 +21,13 @@ defaults() {
     mkdir -p ~/keys
     mkdir -p ~/certs
     mkdir -p ~/challenges
-    
+
+    t=`date +%Y%m%d%H%M`
+    let u=$t-1000000
+
+    MONTHAGO=/tmp/MONTHAGO
+    touch -t "$u" $MONTHAGO
+
     if [ -f  ~/env.sh ]; then
        . ~/env.sh
     fi
@@ -98,8 +104,7 @@ cd ~/acme-cluster
 
 CROSS=~/keys/lets-encrypt-x3-cross-signed.pem
 
-if test `find "$CROSS" -mtime 30`
-then
+if [ $CROSS -ot $MONTHAGO ]; then
     wget -O - https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem > /tmp/lets-encrypt-x3-cross-signed.pem
     if [ -s /tmp/lets-encrypt-x3-cross-signed.pem ]; then
         mv /tmp/lets-encrypt-x3-cross-signed.pem ~/keys/
@@ -134,8 +139,7 @@ do
             echo "$CSR is newer than $PEM"
             acme_tiny
         else 
-            if test `find "$PEM" -mtime 30`
-            then
+            if [ $PEM -ot $MONTHAGO ]; then
                 echo "renew cert for: ${domain}"
                 acme_tiny
             fi
